@@ -2,27 +2,17 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
-var wg sync.WaitGroup
+func hello(s string, n int) {
+	for i := 0; i <= 10; i++ {
+		fmt.Print(i, s)
+		time.Sleep(time.Duration(n) * time.Millisecond)
+	}
+}
 
 func main() {
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		fmt.Println("1st goroutine sleeping")
-		time.Sleep(1 * time.Microsecond)
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		fmt.Println("2nd goroutine sleeping...")
-		time.Sleep(2 * time.Microsecond)
-	}()
-
-	wg.Wait()
-	fmt.Println("All goroutines complete.")
+	go hello("hello", 50)
+	hello("bye", 100)
 }
