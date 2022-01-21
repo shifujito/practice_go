@@ -2,17 +2,18 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
-func hello(s string, n int) {
-	for i := 0; i <= 10; i++ {
-		fmt.Println(i, s)
-		time.Sleep(time.Duration(n) * time.Millisecond)
+func total(n int, c chan int) {
+	t := 0
+	for i := 1; i <= n; i++ {
+		t += i
 	}
+	c <- t
 }
 
 func main() {
-	go hello("hello", 50)
-	hello("bye", 50)
+	c := make(chan int)
+	go total(100, c)
+	fmt.Println("total", <-c)
 }
