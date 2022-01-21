@@ -7,12 +7,12 @@ import (
 
 func hello(s string, n int) {
 	for i := 0; i <= 10; i++ {
-		fmt.Print(i, s)
+		fmt.Println(i, s)
 		time.Sleep(time.Duration(n) * time.Millisecond)
 	}
 }
 
 func main() {
 	go hello("hello", 50)
-	hello("bye", 100)
+	hello("bye", 50)
 }
