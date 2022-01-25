@@ -21,6 +21,10 @@ func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func MustAuth(handler http.Handler) http.Handler {
+	return &authHandler{next: handler}
+}
+
 func main() {
 
 }
