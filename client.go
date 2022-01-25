@@ -52,3 +52,7 @@ func (c *Client) readPump() {
 		c.hub.broadcast <- message
 	}
 }
+
+func (c *Client) writePump() {
+
+}
