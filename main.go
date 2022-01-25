@@ -24,6 +24,6 @@ func main() {
 	r := newRoom()
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
-
 	go r.run()
+	http.ListenAndServe(":8080", nil)
 }
