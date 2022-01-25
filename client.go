@@ -1,58 +1,34 @@
 package main
 
-import (
-	"bytes"
-	"log"
-	"time"
+import "github.com/gorilla/websocket"
 
-	"github.com/gorilla/websocket"
-)
-
-type Client struct {
-	hub  *Hub
-	conn *websocket.Conn
-
-	send chan []byte
+type client struct {
+	socket *websocket.Conn
+	send   chan []byte
+	room   *room
 }
 
-const (
-	writeWait      = 10 * time.Second
-	pongWait       = 10 * time.Second
-	pingPeriod     = (pongWait * 9) / 10
-	maxMessageSize = 512
-)
-
-var (
-	newline = []byte{'\n'}
-	space   = []byte{' '}
-)
-
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-func (c *Client) readPump() {
-	defer func() {
-		c.hub.unregister <- c
-		c.conn.Close()
-	}()
-	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
-	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+func (c *client) read() {
+	// クライアントがwebsocketからreadmessageを使ってデータを読み込む
 	for {
-		_, message, err := c.conn.ReadMessage()
-		if err != nil {
-			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: ", err)
-			}
+		// データの読み込みを行う
+		if _, msg, err := c.socket.ReadMessage(); err == nil {
+			// roomのforwardチャネルに送る
+			c.room.forward <- msg
+		} else {
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
 	}
+	c.socket.Close()
 }
 
-func (c *Client) writePump() {
-
+func (c *client) write() {
+	// sendチャネルからメッセージを受け取り、websocketのwritemessageを使って書き出す。
+	for msg := range c.send {
+		// websocketへの書き込み
+		if err := c.socket.WriteMessage(websocket.TextMessage, msg); err != nil {
+			break
+		}
+	}
+	c.socket.Close()
 }
