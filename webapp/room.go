@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -57,6 +58,7 @@ func (r *room) run() {
 			// forward message to all clients
 			for client := range r.clients {
 				client.send <- msg
+				fmt.Println("a")
 				// r.tracer.Trace(" -- sent to client")
 			}
 		}

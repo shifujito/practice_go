@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -21,6 +23,7 @@ func (c *client) read() {
 	defer c.socket.Close()
 	for {
 		_, msg, err := c.socket.ReadMessage()
+		fmt.Println("c")
 		if err != nil {
 			return
 		}
@@ -31,6 +34,7 @@ func (c *client) read() {
 func (c *client) write() {
 	defer c.socket.Close()
 	for msg := range c.send {
+		fmt.Println("b")
 		err := c.socket.WriteMessage(websocket.TextMessage, msg)
 		if err != nil {
 			return
