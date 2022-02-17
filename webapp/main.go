@@ -22,7 +22,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		t.templ = template.Must(template.ParseFiles(filepath.Join("templates", t.filename)))
 	})
 	// 出力先に渡す。
-	t.templ.Execute(w, nil)
+	t.templ.Execute(w, r)
 }
 
 func main() {
@@ -32,7 +32,8 @@ func main() {
 	// ルームを作成
 	r := newRoom()
 
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/room", r)
 
 	// get the room going
