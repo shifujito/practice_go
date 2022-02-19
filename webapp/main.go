@@ -2,11 +2,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
 	"sync"
 	"text/template"
+
+	"github.com/joho/godotenv"
 )
 
 type templateHandler struct {
@@ -23,6 +26,13 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	})
 	// 出力先に渡す。
 	t.templ.Execute(w, r)
+}
+
+func loadEnv() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		fmt.Printf("読み込み出来ませんでした: %v", err)
+	}
 }
 
 func main() {
