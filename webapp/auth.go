@@ -58,14 +58,20 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Location", url)
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	case "callback":
+		// oauthコネクト
 		config := GetConnect()
+		// 認可コード
 		code := r.URL.Query().Get("code")
+		// contextはよくわからないから調べる
 		ctx := context.Background()
+		// アクセストークン
 		tok, err := config.Exchange(ctx, code)
 		if err != nil {
 			panic(err)
 		}
+		// HTTPクライアント
 		client := config.Client(ctx, tok)
+		// get user info
 		resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
 		if err != nil {
 			panic(err)
@@ -77,7 +83,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 		fmt.Println(string(body))
-		// queryのcodeが認可トークン（一時トークン)
 		w.Header().Set("Location", "/")
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	default:
