@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -14,6 +15,11 @@ import (
 
 type authHandler struct {
 	next http.Handler
+}
+
+type UserInfo struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
 }
 
 func (h *authHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -82,8 +88,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(string(body))
-		w.Header().Set("Location", "/")
+		var userInfo UserInfo
+		err = json.Unmarshal(body, &userInfo)
+		if err != nil {
+			panic(err)
+		}
+		// なぜかsetcookieされない
+		cookie := http.Cookie{
+			Name:     "auth",
+			Value:    "a",
+			HttpOnly: true,
+		}
+		http.SetCookie(w, &cookie)
+		w.Header().Set("Location", "/chat")
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	default:
 		w.WriteHeader(http.StatusNotFound)
