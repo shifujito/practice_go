@@ -1,29 +1,45 @@
 package main
 
 import (
+	"encoding/base64"
+	"fmt"
 	"net/http"
+	"time"
 )
 
-func setCookie(w http.ResponseWriter, r *http.Request) {
-	c1 := http.Cookie{
-		Name:     "first_cookie",
-		Value:    "Go web",
-		HttpOnly: true,
+func setMsg(w http.ResponseWriter, r *http.Request) {
+	msg := []byte("Hello World!")
+	c := http.Cookie{
+		Name:  "flash",
+		Value: base64.URLEncoding.EncodeToString(msg),
 	}
-	c2 := http.Cookie{
-		Name:     "hoge",
-		Value:    "fuga",
-		HttpOnly: true,
+	http.SetCookie(w, &c)
+}
+
+func showMsg(w http.ResponseWriter, r *http.Request) {
+	c, err := r.Cookie("flash")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			fmt.Fprintln(w, "no message")
+		}
+	} else {
+		rc := http.Cookie{
+			Name:    "flash",
+			MaxAge:  -1,
+			Expires: time.Unix(1, 0),
+		}
+		http.SetCookie(w, &rc)
+		val, _ := base64.URLEncoding.DecodeString(c.Value)
+		fmt.Fprintln(w, string(val))
 	}
-	w.Header().Set("Set-Cookie", c1.String())
-	w.Header().Add("Set-Cookie", c2.String())
 }
 
 func main() {
 	server := http.Server{
 		Addr: "127.0.0.1:8080",
 	}
-	http.HandleFunc("/cookie", setCookie)
+	http.HandleFunc("/set_msg", setMsg)
+	http.HandleFunc("/show_msg", showMsg)
 
 	server.ListenAndServe()
 }
