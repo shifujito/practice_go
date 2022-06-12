@@ -1,10 +1,26 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 )
+
+type Post struct {
+	User    string
+	Threads []string
+}
+
+func jsonHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	post := &Post{
+		User:    "Shion Fujito",
+		Threads: []string{"1", "2", "3"},
+	}
+	json, _ := json.Marshal(post)
+	w.Write(json)
+}
 
 func headers(w http.ResponseWriter, r *http.Request) {
 	h := r.Header
@@ -31,23 +47,6 @@ func process(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, r.PostForm)
 }
 
-func writeExample(w http.ResponseWriter, r *http.Request) {
-	str := `<html>
-	<head>
-	  <title>Golang</title>
-	</head>
-	<body>
-	  <form action="http://127.0.0.1:8080/process" method="POST" enctype="multipart/form-data">
-		<input type="text" name="hello" value="hoge" />
-		<input type="text" name="post" value="456" />
-		<input type="file" name="uploaded">
-		<input type="submit" />
-	  </form>
-	</body>
-  </html>`
-	w.Write([]byte(str))
-}
-
 func writeHeaderExample(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(501)
 	fmt.Fprintln(w, "not implement")
@@ -65,7 +64,7 @@ func main() {
 	http.HandleFunc("/header", headers)
 	http.HandleFunc("/body", body)
 	http.HandleFunc("/process", process)
-	http.HandleFunc("/write", writeExample)
+	http.HandleFunc("/json", jsonHandler)
 	http.HandleFunc("/writeheader", writeHeaderExample)
 	http.HandleFunc("/red", headerExample)
 
