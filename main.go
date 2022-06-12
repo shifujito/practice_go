@@ -67,7 +67,7 @@ func main() {
 	http.HandleFunc("/process", process)
 	http.HandleFunc("/write", writeExample)
 	http.HandleFunc("/writeheader", writeHeaderExample)
-	http.HandleFunc("red", headerExample)
+	http.HandleFunc("/red", headerExample)
 
 	server.ListenAndServe()
 }
