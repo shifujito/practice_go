@@ -17,12 +17,18 @@ func body(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, string(body))
 }
 
+func process(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	fmt.Fprintln(w, r.PostForm)
+}
+
 func main() {
 	server := http.Server{
 		Addr: "127.0.0.1:8080",
 	}
 	http.HandleFunc("/header", headers)
 	http.HandleFunc("/body", body)
+	http.HandleFunc("/process", process)
 
 	server.ListenAndServe()
 }
