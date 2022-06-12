@@ -31,6 +31,28 @@ func process(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, r.PostForm)
 }
 
+func writeExample(w http.ResponseWriter, r *http.Request) {
+	str := `<html>
+	<head>
+	  <title>Golang</title>
+	</head>
+	<body>
+	  <form action="http://127.0.0.1:8080/process" method="POST" enctype="multipart/form-data">
+		<input type="text" name="hello" value="hoge" />
+		<input type="text" name="post" value="456" />
+		<input type="file" name="uploaded">
+		<input type="submit" />
+	  </form>
+	</body>
+  </html>`
+	w.Write([]byte(str))
+}
+
+func writeHeaderExample(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(501)
+	fmt.Fprintln(w, "not implement")
+}
+
 func main() {
 	server := http.Server{
 		Addr: "127.0.0.1:8080",
@@ -38,6 +60,8 @@ func main() {
 	http.HandleFunc("/header", headers)
 	http.HandleFunc("/body", body)
 	http.HandleFunc("/process", process)
+	http.HandleFunc("/write", writeExample)
+	http.HandleFunc("/writeheader", writeHeaderExample)
 
 	server.ListenAndServe()
 }
