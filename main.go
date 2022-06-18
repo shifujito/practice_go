@@ -3,6 +3,8 @@ package main
 import (
 	"html/template"
 	"net/http"
+
+	"./model"
 )
 
 func process(w http.ResponseWriter, r *http.Request) {
@@ -10,7 +12,8 @@ func process(w http.ResponseWriter, r *http.Request) {
 	// t, _ := template.ParseFiles("client/index.html")
 	// Must関数を挟んでエラーをラップ
 	t := template.Must(template.ParseGlob("client/*.html"))
-	daysOfWeek := []string{"月", "火", "水", "木", "金", "土", "日"}
+	daysOfWeek := model.Process()
+	// daysOfWeek := []string{"月", "火", "水", "木", "金", "土", "日"}
 	// dataをテンプレートに当てはめている。
 	t.Execute(w, daysOfWeek)
 }

@@ -1,3 +1,3 @@
-module real_http
+module test
 
 go 1.17
