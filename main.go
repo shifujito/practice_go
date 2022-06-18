@@ -7,7 +7,9 @@ import (
 
 func process(w http.ResponseWriter, r *http.Request) {
 	// htmlを解析
-	t, _ := template.ParseFiles("client/index.html")
+	// t, _ := template.ParseFiles("client/index.html")
+	// Must関数を挟んでエラーをラップ
+	t := template.Must(template.ParseFiles("client/index.html"))
 	// dataをテンプレートに当てはめている。
 	t.Execute(w, "Hello World")
 }
