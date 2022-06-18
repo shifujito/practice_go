@@ -9,9 +9,10 @@ func process(w http.ResponseWriter, r *http.Request) {
 	// htmlを解析
 	// t, _ := template.ParseFiles("client/index.html")
 	// Must関数を挟んでエラーをラップ
-	t := template.Must(template.ParseFiles("client/index.html"))
+	t := template.Must(template.ParseGlob("client/*.html"))
+	daysOfWeek := []string{"月", "火", "水", "木", "金", "土", "日"}
 	// dataをテンプレートに当てはめている。
-	t.Execute(w, "Hello World")
+	t.Execute(w, daysOfWeek)
 }
 
 func main() {
